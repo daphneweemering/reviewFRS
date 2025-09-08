@@ -1,12 +1,12 @@
-## Statistical analysis of disability scales in randomised controlled clinical trials for amyotrophic lateral sclerosis: A systematic review
+# Statistical analysis of disability scales in randomised controlled clinical trials for amyotrophic lateral sclerosis: A systematic review
 
 This research repository contains all material related to our study *"Statistical analysis of disability scales in randomised controlled clinical trials for amyotrophic lateral sclerosis: A systematic review"*
 
-# What's the project about? # 
+## What's the project about? # 
 Disability rating scales play a pivotal role in clinical trials by assessing how experimental treatments affect the daily lives of people with neurodegenerative diseases. Limited guidance on analysing these scales may contribute to the high failure rate of clinical trials. Using amyotrophic lateral sclerosis (ALS) as a case study, we aim to systematically review how disability rating scales have been analysed in clinical trials, and how these approaches influence
 the validity and the precision of trial results.
 
-# What is in the repository? #
+## What is in the repository? #
 
 | Folder     | Content |
 |:-----------|:-----------------------------------------------------------------------|
@@ -14,7 +14,7 @@ the validity and the precision of trial results.
 | scripts    | Contains analysis scripts:<br><br> • [`clean.CEF.R`](scripts/clean.CEF.R) – Cleans data from the **Ceftriaxone ALS trial**.<br> • [`clean.RT001.R`](scripts/clean.RT001.R) – Cleans data from the **RT001 ALS trial**.<br> • [`TE.R`](scripts/TE.R) – Simulates permuted treatment assignment and applies treatment effects.<br> • [`studyadj.R`](scripts/studyadj.R) – Adjusts data for **study-based modifications**.<br> • [`perm.CEF.R`](scripts/perm.CEF.R) – Fits models to the simulated **Ceftriaxone ALS trial** data.<br> • [`perm.RT001.R`](scripts/perm.RT001.R) – Fits models to the simulated **RT001 ALS trial** data.<br> • [`sim.JM.R`](scripts/sim.JM.R) – Simulates data and fits models using the **joint modeling framework**. |
 | supplementary material | Holds the supplementary material in separate files. |
 
-# Machine and package information
+## Machine and package information
 ```
 ─ Session info ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
  setting  value
@@ -145,8 +145,8 @@ the validity and the precision of trial results.
  zoo          * 1.8-12    2023-04-13 [1] CRAN (R 4.4.0)
 ```
 
-# Access and permissions
+## Access and permissions
 The creation and maintenance of this research repository are the responsibilities of the author (Daphne Weemering). This archive is completely open access, and can be accessed for an indefinite period.
 
-# Contact 
+## Contact 
 You can reach me via email at <d.n.weemering@umcutrecht.nl> or <dnweemering@gmail.com> for questions regarding this repository. For correspondence regarding this article, contact Dr. Ruben van Eijk (corresponding author) at <r.p.a.vaneijk-2@umcutrecht.nl>.
