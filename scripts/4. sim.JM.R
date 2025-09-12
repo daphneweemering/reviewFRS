@@ -62,24 +62,13 @@ vc <- matrix(c(54.1809471, 2.67757780, -0.201746783,
                2.67757780, 1.72379573, -0.078242505, 
                -0.2017468, -0.07824251, 0.005542269), nrow = 3, ncol = 3)
 
-JMD <- function(N = 500, Nm = 7, Nm.pre, B2 = 0, B4 = 0, g1 = 0, FUT = 12, DO.TRT = 0.4, 
+JMD <- function(N = 500, Nm = 7, Nm.pre, B2 = 0, B4 = 0, g1 = 0, FUT = 12, DO.TRT = 0.2, 
                 DO.PLB = 0.2){ 
-  ##############################################################
-  ## N       = number of individuals                          ##
-  ## Nm      = maximum number of measurements per individual  ##
-  ## dy      = treatment effect difference in ALSFRS-R        ##
-  ## g1      = treatment effect difference in survival        ##
-  ## FUT     = follow-up time in years                        ##
-  ## cenrate = censoring rate                                 ##
-  ##############################################################
   
   # coefficients
   Us <- as.data.frame(mvrnorm(n = N, mu = c(0, 0, 0), Sigma = vc))
   
   colnames(Us) <- c("u0i", "u1i", "u2i")
-  
-  # D <- cbind(data.frame(ID  = seq(1:N), 
-  #                       TRT = rep(0:1, each = 0.5*N)), Us)
   
   # 2:1 randomization
   D <- cbind(data.frame(ID  = seq(1:N), 
@@ -133,9 +122,6 @@ JMD <- function(N = 500, Nm = 7, Nm.pre, B2 = 0, B4 = 0, g1 = 0, FUT = 12, DO.TR
   
   DL <- merge(DL, D, by = "ID")
   
-  # DL$TOT <- with(DL, B0 + u0i + B1*(1 - B2*TRT)*TIME + B3*(1 - B4*TRT)*TIME^2 +
-  #                  u1i*TIME + u2i*TIME^2 + rnorm(n = nrow(DL), mean = 0, sd = sqrt(e)))
-  
   DL$TOT <- with(DL, B0 + u0i +
                    # pre-treatment slope (same for all)
                    B1*TIME*(TIME < 0) + B3*TIME^2*(TIME < 0) +
@@ -159,11 +145,10 @@ JMD <- function(N = 500, Nm = 7, Nm.pre, B2 = 0, B4 = 0, g1 = 0, FUT = 12, DO.TR
   D <- D[order(D$ID), ]
   D$ID <- as.factor(as.integer(D$ID))
   
-  DL <- DL[!DL$STATUS == 1, ] # remove measurements after death/dropout time from longitudinal data
-  DL <- DL[order(DL$ID, DL$TIME), ] # order longitudinal data by ID and TIME
+  DL <- DL[!DL$STATUS == 1, ] 
+  DL <- DL[order(DL$ID, DL$TIME), ] 
   DL$ID <- as.factor(as.integer(DL$ID))
-  
-  D <- D[!(D$ID %in% setdiff(1:N, DL$ID)), ] # remove IDs with no measurement on longitudinal data
+  D <- D[!(D$ID %in% setdiff(1:N, DL$ID)), ] 
   
   # CFB
   BSLN <- DL[DL$TIME == 0, c("ID", "TOT")]
@@ -443,11 +428,11 @@ JMD <- function(N = 500, Nm = 7, Nm.pre, B2 = 0, B4 = 0, g1 = 0, FUT = 12, DO.TR
   
   # "neirest neighbour" worst score imputation
   nn <- function(i, d) {
-    lrow <- d[i, ] # select row for each ID with missing data on CFB_6
-    prox <- d[d$TRT == lrow$TRT & !is.na(d$CFB_6), ] # all IDs in same TRT with no missing data on CFB_6 (prox group)
-    prox$diff <- abs(prox$TOT_0 - lrow$TOT_0) # difference between ID and all IDs in the prox group
+    lrow <- d[i, ] 
+    prox <- d[d$TRT == lrow$TRT & !is.na(d$CFB_6), ]
+    prox$diff <- abs(prox$TOT_0 - lrow$TOT_0) 
     
-    return(min(prox[order(prox$diff), ][1:5, ]$CFB_6)) # return CFB_6 of the five patients with BSLN closest to ID and pick the biggest decline
+    return(min(prox[order(prox$diff), ][1:5, ]$CFB_6)) 
   }
   
   for (i in which(is.na(WD.KAUF$CFB_6) & WD.KAUF$EVENT != 1)) {
@@ -476,9 +461,6 @@ JMD <- function(N = 500, Nm = 7, Nm.pre, B2 = 0, B4 = 0, g1 = 0, FUT = 12, DO.TR
   LOCF.BERRY <- LOCF.BERRY[order(LOCF.BERRY$ID), ]
   
   # Cudkowicz (2022) & Elia (2015) _____________________________________________
-  # IDs with at least one post-baseline obs
-  # vID <- DL2[TIME >= 0, .N, by = ID][N > 1, ID]
-  
   # compute PRE, POST, DELTA from model
   R <- function(dt) {
     dt[, {
@@ -489,11 +471,9 @@ JMD <- function(N = 500, Nm = 7, Nm.pre, B2 = 0, B4 = 0, g1 = 0, FUT = 12, DO.TR
     }, by = ID]
   }
   
-  # RESP.ELIA <- R(DL2[ID %in% vID])
   RESP.ELIA <- R(LOCF3)
   RESP.CUD <- R(LOCF3)
   
-  # RESP.ELIA <- merge(RESP.ELIA, unique(DL2[, c("ID", "TRT", "BSLN", "EVENT")]), by = "ID", all.x = TRUE)
   RESP.ELIA <- merge(RESP.ELIA, unique(LOCF3[, c("ID", "TRT", "BSLN", "EVENT")]), by = "ID", all.x = TRUE)
   RESP.CUD <- merge(RESP.CUD, unique(LOCF3[, c("ID", "TRT", "BSLN", "EVENT")]), by = "ID", all.x = TRUE)
   
@@ -513,11 +493,6 @@ JMD <- function(N = 500, Nm = 7, Nm.pre, B2 = 0, B4 = 0, g1 = 0, FUT = 12, DO.TR
   
 }
 
-
-# D <- JMD(N = 500, Nm = 7, Nm.pre = 4, B2 = 0.4, B4 = 0.4, g1 = 0, FUT = 12, DO.TRT = 0, DO.PLB = 0)
-# 
-# m <- lme(fixed = TOT ~ TIME + TIME:TRT, random = ~ TIME|ID, data = D$LD)
-# cox <- coxph(Surv())
 
 ################################################################################
 ##                                                                            ##
@@ -650,10 +625,6 @@ X <- pbmclapply(1:10000, function(i){
   e24 <- (as.data.frame(contrast(emmeans(m24, ~ TRT | VISIT, at = list(VISIT = "6")), method = "pairwise"))$estimate)*-1
   p24 <- as.data.frame(contrast(emmeans(m24, ~ TRT | VISIT, at = list(VISIT = "6")), method = "pairwise"))$p.value
   
-  # m25 <- lmer(CFB ~ TIME + TIME:TRT + (TIME|ID), data = D$LD[!D$LD$VISIT == 0, ], control = lmerControl(optimizer = "nlminbwrap"))
-  # e25 <- (as.data.frame(contrast(emmeans(m25, ~ TRT | TIME, at = list(TIME = 12)), method = "pairwise"))$estimate)*-1
-  # p25 <- as.data.frame(contrast(emmeans(m25, ~ TRT | TIME, at = list(TIME = 12)), method = "pairwise"))$p.value
-  
   m25 <- mmrm(CFB ~ TRT:VISIT + VISIT + BSLN + us(VISIT|ID), data = D$LOCF2[!D$LOCF2$VISIT == 0, ])
   e25 <- (as.data.frame(contrast(emmeans(m25, ~ TRT | VISIT, at = list(VISIT = "6")), method = "pairwise"))$estimate)*-1
   p25 <- as.data.frame(contrast(emmeans(m25, ~ TRT | VISIT, at = list(VISIT = "6")), method = "pairwise"))$p.value
@@ -683,19 +654,4 @@ X <- pbmclapply(1:10000, function(i){
   
   return(list(c(mget(paste0("e", 1:30)), mget(paste0("p", 1:30)))))
 }, mc.cores = 3)
-
-
-# p <- sapply(1:100, function(i) X[[i]][[1]][32:62])
-# p <- apply(p, 1, function(x) mean(x <= 0.05))
-# 
-# 
-# saveRDS(X, file = "/Users/dweemeri/surfdrive - Weemering, D.N. (Daphne)@surfdrive.surf.nl/desktop data/FRS.JM/NEW2/FRS.JM.NULL.10000.rds")
-# test <- readRDS("/Users/dweemeri/Desktop/FRS.JM/FRS.JM.FRS.HR.10000.rds")
-# p <- sapply(1:10000, function(i) test[[i]][[1]][32:62])
-# p <- apply(p, 1, function(x) mean(x <= 0.05))
-
-
-
-
-
 

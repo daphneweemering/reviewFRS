@@ -138,12 +138,6 @@ WD$TRICALS <- (0.474 * ((WD$SVCP/100)^-1) + ((WD$SVCP/100)^-0.5)) -
   (1.839 * ((-WD$DELFRS + 0.1)^-0.5)) - (0.264 * (WD$AGE_SYMP/100)^-2) + 
   (0.271 * WD$ONSET)
 
-#### OLD ####
-# LD <- gather(WD, V, value, V0.TOT:V4.TIME) %>%
-#   separate(V, c('VISIT', 'col')) %>%
-#   arrange(ID) %>%
-#   spread(col, value)
-#############
 
 LD <- gather(WD, V, value, SCRN.TOT:V3.TIME) %>%
   separate(V, c('VISIT', 'col')) %>%
@@ -163,14 +157,6 @@ LD <- LD[!LD$VISIT %in% "SCRN", ]
 LD$VISIT <- as.factor(gsub("V", "", LD$VISIT))
 
 LD$CFB <- ifelse(LD$VISIT == 0, 0, LD$CFB)
-
-#### OLD ####
-# BSLN <- as.data.frame(cbind(D$ID, LD[!duplicated(LD$ID),]$TOT))
-# names(BSLN) <- c('ID', 'BSLN')
-# LD <- merge(LD, BSLN, by = 'ID', all.x = T)
-# LD$BSLN <- as.numeric(LD$BSLN)
-# LD <- LD[!LD$VISIT == 'V0',]
-#############
 
 
 #### Missing data scenarios 

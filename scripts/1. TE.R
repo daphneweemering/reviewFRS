@@ -3,7 +3,6 @@ library(dplyr)
 library(data.table)
 
 D.TE <- function(TE, D = c("RT001", "CEF"), TRT.cenrate) {
-  # D <- "RT001" # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! REMOVE
   
   MAX.VISIT <- ifelse(D == "RT001", 3, 6)
   
@@ -12,9 +11,6 @@ D.TE <- function(TE, D = c("RT001", "CEF"), TRT.cenrate) {
   } else{
     source("/Users/dweemeri/surfdrive - Weemering, D.N. (Daphne)@surfdrive.surf.nl/reviewFRS/reviewFRS/scripts/0. clean.CEF.R")
   }
-  
-  # D <- "RT001" # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! REMOVE
-  # TE <- 0 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! REMOVE
   
   
   # 1. PERMUTE TREATMENT ASSIGNMENT + TRT EFFECT (optional) ____________________
@@ -43,8 +39,6 @@ D.TE <- function(TE, D = c("RT001", "CEF"), TRT.cenrate) {
   
   
   # 2. UNBALANCED DROPOUT ______________________________________________________
-  # TRT.cenrate <- 0.2 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! REMOVE
-  
   if(TRT.cenrate > 0){
     LD <- setDT(LD)
     LD[, CFB := as.numeric(CFB)]
@@ -155,9 +149,6 @@ D.TE <- function(TE, D = c("RT001", "CEF"), TRT.cenrate) {
   
   
   # 3. OTHER DATASETS __________________________________________________________
-  
-  # MAX.VISIT <- 3 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! REMOVE
-  
   # LOCF2 (long dataset)
   LOCF2 <- LD
   LOCF2 <- merge(expand.grid(ID = unique(LD$ID), VISIT = 0:MAX.VISIT), LD,           

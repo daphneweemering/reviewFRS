@@ -1,7 +1,6 @@
 # adjustments to the datasets based on study-specifics
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 source("1. TE.R")
-# source("TEMP.TE.R")
 
 library(mice)
 library(data.table)
@@ -49,19 +48,6 @@ D.ADJ.CEF <- function(TE, D = "CEF", TRT.cenrate){ # TRT.cenrate <- 1 == doubled
       return(12)
     }
   })
-
-
-  # # 7. -- Berry - 2019 - MSC-NTF - PMID: 31740545 --------------------------------
-  # LD.BER <- LD[LD$ID %in% names(table(LD$ID)[table(LD$ID) > 1]), ]
-  # POSTSLP <- lapply(unique(LD.BER$ID), function(i){
-  #   POSTSLP <- summary(lm(TOT ~ TIME, data = subset(LD, LD$ID == i)))$coefficients[2, 1]
-  # })
-  # 
-  # LD.BER$ID <- droplevels(LD.BER$ID)
-  # LD.BER <- data.frame(ID = as.factor(rep(names(table(LD$ID)[table(LD$ID) > 1]), 2)),
-  #                       SLP = c(tapply(LD.BER$DELFRS, LD.BER$ID, function(x) x[1]), do.call("rbind", POSTSLP)),
-  #                       PER = rep(c(0, 1), each = length(c(names(table(LD$ID)[table(LD$ID) > 1])))))
-  # LD.BER$TRT <- LD$TRT[match(LD.BER$ID, LD$ID)]
 
 
   # 10. -- Cudkowicz - 2013 - dexpramipexole - PMID: 24067398 --------------------
@@ -162,26 +148,6 @@ D.ADJ.CEF <- function(TE, D = "CEF", TRT.cenrate){ # TRT.cenrate <- 1 == doubled
   WD.JR <- as.data.frame(finscore)
 
 
-  # # 12. -- Cudkowicz - 2022 - MSC-NTF - PMID: 34890069 ---------------------------
-  # # 15. -- Elia - 2015 - tauroursodeoxycholic acid - PMID: 25664595 ------------
-  # LOCF2 <- as.data.table(LOCF2)
-  # 
-  # # obtain pre-slopes by extracting individual progression rates
-  # m <- lmer(TOT ~ TIME + (TIME|ID), data = LD)
-  # PRE <- data.table(ID = unique(LOCF2$ID),
-  #                   PRE = fixef(m)["TIME"] + ranef(m)$ID$TIME)
-  # 
-  # RESP <- LOCF2[, .(POST = coef(lm(TOT ~ TIME))[2],
-  #                   ID = ID, TRT = TRT, BSLN = BSLN, DISDUR = DISDUR,
-  #                   ONSET = ONSET, RILUSE = RILUSE, CENSOR = CENSOR), by = ID]
-  # 
-  # RESP <- RESP[PRE, on = "ID"]
-  # RESP <- RESP[, .SD[1], by = ID]
-  # LOCF.RESP <- RESP[, c("RESP.ELIA", "RESP.CUD") := .(if_else(((POST - PRE)/PRE) <= TE, 1, 0),
-  #                  if_else((CENSOR == 1 | ((POST - PRE)/PRE) <= TE), 1, 0)),
-  #              by = ID]
-
-
   # 19. -- Kaji - 2019 - methylcobalamin - PMID: 30636701 ----------------------
   WD.KAJI <- WD
   WD.KAJI$V6.CFB <- ifelse((is.na(WD.KAJI$V6.CFB) & WD.KAJI$CENSOR == 1), -999, WD.KAJI$V6.CFB)
@@ -195,7 +161,7 @@ D.ADJ.CEF <- function(TE, D = "CEF", TRT.cenrate){ # TRT.cenrate <- 1 == doubled
 
   # 20. -- Kaufmann - 2009 - COQ10 - PMID: 19743457 ----------------------------
   WD.KAUF <- WD
-  
+
   # "neirest neighbour" worst score imputation
   nn <- function(i, d) {
     lrow <- d[i, ] # select row for each ID with missing data on V6.CFB
@@ -288,32 +254,21 @@ D.ADJ.CEF <- function(TE, D = "CEF", TRT.cenrate){ # TRT.cenrate <- 1 == doubled
   LOCF.MORA <- WD
   LOCF.MORA$V6.TOT <- ifelse((is.na(LOCF.MORA$V6.TOT) & LOCF.MORA$CENSOR == 1), 0, LOCF.MORA$V6.TOT)
   LOCF.MORA$V6.CFB <- LOCF.MORA$V6.TOT - LOCF.MORA$V0.TOT
-  
+
   LOCF.MORA.cols <- LOCF.MORA[, which(names(LOCF.MORA) == "V0.TOT"):which(names(LOCF.MORA) == "V6.CFB")]
   LOCF.MORA <- as.data.frame(t(apply(LOCF.MORA.cols, 1, function(x) na.locf(x, na.rm = FALSE))))
   LOCF.MORA <- cbind(WD[, which(names(WD) == "ID"):which(names(WD) == "V6.TIME")], LOCF.MORA)
 
-  # rm(list = setdiff(ls(), c(lsf.str(), c("WD", "LD", "LOCF", "LOCF2", "ZERO",
-  #                                        "COMP", "WD.AGG", "LD.BER", "WD.JR", "LOCF.RESP",
-  #                                        "WD.KAJI", "WD.KAUF", "WD.MILL", "LOCF.MORA"), "TE", "TRT.cenrate")))
-  # 
-  # list(WD = WD, LD = LD, LOCF = LOCF, LOCF2 = LOCF2, ZERO = ZERO,
-  #      COMP = COMP, WD.AGG = WD.AGG, LD.BER = LD.BER, WD.JR = WD.JR,
-  #      LOCF.RESP = LOCF.RESP, WD.KAJI = WD.KAJI, WD.KAUF = WD.KAUF,
-  #      WD.MILL = WD.MILL, LOCF.MORA = LOCF.MORA)
-  
+
   rm(list = setdiff(ls(), c(lsf.str(), c("WD", "LD", "LOCF", "LOCF2", "ZERO",
-                                         "COMP", "WD.AGG", "WD.JR", "WD.KAJI", 
+                                         "COMP", "WD.AGG", "WD.JR", "WD.KAJI",
                                          "WD.KAUF", "WD.MILL", "LOCF.MORA"), "TE", "TRT.cenrate")))
-  
-  list(WD = WD, LD = LD, LOCF = LOCF, LOCF2 = LOCF2, ZERO = ZERO, COMP = COMP, 
+
+  list(WD = WD, LD = LD, LOCF = LOCF, LOCF2 = LOCF2, ZERO = ZERO, COMP = COMP,
        WD.AGG = WD.AGG, WD.JR = WD.JR, WD.KAJI = WD.KAJI, WD.KAUF = WD.KAUF,
        WD.MILL = WD.MILL, LOCF.MORA = LOCF.MORA)
 
 }
-
-
-
 
 
 

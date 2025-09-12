@@ -15,7 +15,7 @@ library(mice)
 library(pbmcapply)
 
 # load data
-TE <- 0
+TE <- 0.2
 TRT.cenrate <- 1
 s <- 10000
 
@@ -47,7 +47,7 @@ X <- pbmclapply(1:s, function(i){
     return(e)
   }
 
-  # # 1. -- Abe - 2014 - edaravone - PMID: 25286015 ------------------------------
+  # 1. -- Abe - 2014 - edaravone - PMID: 25286015 ------------------------------
   m1 <- lm(V6.CFB ~ TRT + DELFRS + ONSET + RILUSE, data = D1$LOCF)
   e1 <- est(m1)
   p1 <- drop1(m1, ~ TRT, test = "Chisq")[2, 5]
@@ -78,8 +78,7 @@ X <- pbmclapply(1:s, function(i){
   p6 <- unname(unlist(summary(emmeans(m6, specs = pairwise ~ TRT, at = list(VISIT = c("6")))$contrast)[6]))
 
   # 7. -- Berry - 2019 - MSC-NTF - PMID: 31740545 ------------------------------
-  # m7 <- lm(SLP ~ TRT + PER + PER:TRT, data = D2$LD.BER)
-  # p7 <- drop1(m7, ~ TRT:PER, test = "Chisq")[2, 5]
+  # not included (no pre-treatment slope)
 
   # 8. -- Boll - 2022 - valproate/lithium - PMID: 36049647 ---------------------
   m8 <- anova_test(data = D2$LD[!is.na(D2$LD$CFB), ], dv = CFB, wid = ID, within = VISIT, between = TRT, type = 3)
@@ -90,7 +89,7 @@ X <- pbmclapply(1:s, function(i){
   p8 <- m8$ANOVA$p[3]
   p8.1 <- m8$`Sphericity Corrections`$`p[GG]`[2] # Greenhouse-Geiser sphericity correction
   p8.2 <- m8$`Sphericity Corrections`$`p[HF]`[2] # Huynh-Feldt sphericity correction
-  
+
   p8 <- p8.1
 
   # 9. -- Cudkowicz - 2011 - dexpramipexole - PMID: 22101764 -------------------
@@ -109,8 +108,7 @@ X <- pbmclapply(1:s, function(i){
   p11 <- drop1(m11, ~ TIME:TRT, test = "Chisq")[2, 4]
 
   # 12. -- Cudkowicz - 2022 - MSC-NTF - PMID: 34890069 -------------------------
-  # m12 <- glm(RESP.CUD ~ TRT + BSLN + DISDUR + ONSET + RILUSE, family = binomial(link = "logit"), data = D1$LOCF.RESP)
-  # p12 <- drop1(m12, ~ TRT, test = "Chisq")[2, 5]
+  # not included (no pre-treatment slope)
 
   # 13. -- De Carvalho - 2010 - memantine - PMID: 20565333 ---------------------
   m13 <- anova_test(data = D2$LOCF2, dv = CFB, wid = ID, within = VISIT, between = TRT, type = 3)
@@ -121,7 +119,7 @@ X <- pbmclapply(1:s, function(i){
 
   p13.1 <- m13$`Sphericity Corrections`$`p[GG]`[2] # Greenhouse-Geiser sphericity correction
   p13.2 <- m13$`Sphericity Corrections`$`p[HF]`[2] # Huynh-Feldt sphericity correction
-  
+
   p13 <- p13.1
 
   # 14. -- De la Rubia - 2019 - EH301 - PMID: 30668199 -------------------------
@@ -130,8 +128,7 @@ X <- pbmclapply(1:s, function(i){
   p14 <- drop1(m14, test = "Chisq")[2, 5]
 
   # 15. -- Elia - 2015 - tauroursodeoxycholic acid - PMID: 25664595 ------------
-  # m15 <- glm(RESP.ELIA ~ TRT, family = binomial(link = "logit"), data = D1$LOCF.RESP)
-  # p15 <- drop1(m15, test = "Chisq")[2, 5]
+  # not included (no pre-treatment slope)
 
   # 16. -- Genge - 2023 - ravulizumab - PMID: 37695623 -------------------------
   m16 <- lm(RANK.genge ~ TRT + AGE + SEX + V0.TOT + FVCP + DISDUR + ONSET + RILUSE,
@@ -160,26 +157,9 @@ X <- pbmclapply(1:s, function(i){
   p20 <- drop1(m20, test = "Chisq")[2, 5]
 
   # 21. -- Kim - 2023 - mecasin - PMID: 37257710 -------------------------------
-  # When TIME:BSLN is included in the model, the effect of TIME:TRT seems to be
-  # incorporated into BSLN:TIME. If BSLN:TIME is removed, TIME:TRT has an effect.
-  # When main effect of TIME is included, the significancy seems to shift towards
-  # the TIME variable. Paper by Morris (2024) about the marginality principle.
-  # "In a regression model with an interaction term, it is wrong to omit the main
-  # effects." (Morris, 2024)
-
-  # LRT 4 models:
-  # - original,
-  # - original + main effect TIME, <- best fitting model
-  # - original + main effect BSLN,
-  # - original - TIME:BSLN
   m21 <- lmer(CFB ~ TIME:TRT + BSLN:TIME + DISDUR:TIME + (TIME|ID), data = D2$LD[!D2$LD$VISIT == 0, ])
   e21 <- est(m21)
   p21 <- summary(contrast(emmeans(m21, ~ TRT, at = list(TIME = 12)), method = "pairwise"))$p
-  # z21 <- z(m21)
-
-  m21.1 <- lmer(CFB ~ TIME + TIME:TRT + BSLN:TIME + DISDUR:TIME + (TIME|ID),
-                data = D2$LD[!D2$LD$VISIT == 0, ])
-  p21.1 <- summary(contrast(emmeans(m21.1, ~ TRT, at = list(TIME = 12)), method = "pairwise"))$p
 
   # 22. -- Levine - 2012 - pioglitazone HCI-tretinoin - PMID: 22830016 ---------
   m22 <- coin::wilcox_test(I((V6.TOT - V0.TOT)/V6.TIME) ~ as.factor(TRT), data = D1$COMP, distribution = "exact")
@@ -191,13 +171,11 @@ X <- pbmclapply(1:s, function(i){
                 (TIME | ID), data = D2$LD, control = lmerControl(optimizer = "Nelder_Mead"))
   e23 <- est(m23)
   p23 <- drop1(m23, ~ TIME:TRT, test = "Chisq")[2, 4]
-  # country/site should be added.
 
   # 24. -- Meininger - 2017 - ozanezumab - PMID: 28139349 ----------------------
   m24 <- lm(SUM ~ TRT + V0.TOT + RILUSE, data = D1$WD.JR)
   e24 <- est(m24)
   p24 <- drop1(m24, ~ TRT, test = "Chisq")[2, 5]
-  # Add country!
 
   # 25. -- Miller - 2007 - TCH346 - PMID: 17709710 -----------------------------
   m25 <- lmer(TOT ~ TIME + TRT + TIME:TRT + (TIME|ID), data = D2$LD, control = lmerControl(optimizer = "nlminbwrap"))
@@ -243,7 +221,6 @@ X <- pbmclapply(1:s, function(i){
   m29 <- lm(V6.CFB ~ TRT + ONSET + V0.TOT + AGE + DELFRS, data = D1$LOCF.MORA)
   e29 <- est(m29)
   p29 <- drop1(m29, ~ TRT, test = "Chisq")[2, 5]
-  # country should still be added
 
   # 30. -- Morimoto - 2023 - ropinirole - PMID: 37267913 -----------------------
   m30 <- mmrm(CFB ~ TRT + VISIT + TRT:VISIT + us(VISIT|ID), data = D2$LD[!D2$LD$VISIT == 0, ])
@@ -326,28 +303,15 @@ X <- pbmclapply(1:s, function(i){
   m44 <- mmrm(CFB ~ VISIT + TRT:VISIT + BSLN + TRICALS:VISIT + us(VISIT|ID), data = D2$LD[!D2$LD$VISIT == 0, ])
   e44 <- est(m44)
   p44 <- unname(unlist(summary(emmeans(m44, specs = pairwise ~ TRT, at = list(VISIT = c("6")))$contrast)[6]))
-  # add country
 
   # 45. -- Weiss - 2016 - mexiletine - PMID: 26911633 --------------------------
   m45 <- lmer(TOT ~ TIME + TIME:TRT + ONSET + DISDUR + RILUSE + ONSET:TIME +
-                DISDUR:TIME + RILUSE:TIME + (TIME|ID), data = D2$LD[!D2$LD$VISIT == 0, ],
+                DISDUR:TIME + RILUSE:TIME + (TIME|ID), data = D2$LD,
               control = lmerControl(optimizer = "nlminbwrap"))
   e45 <- est(m45)
   p45 <- drop1(m45, ~ TIME:TRT, test = "Chisq")[2, 4]
 
-  # return(c(mget(paste0("p", c(1:45))), p8.1, p8.2, p13.1, p13.2, p21.1))
-  # # # p21.1 is to test whether that improves FP rate of Kim (2023).
-
   return(c(mget(paste0("p", c(1:6, 8:11, 13:14, 16:45))), mget(paste0("e", c(1:6, 8:11, 13:14, 16:45)))))
   
 }, mc.cores = 3)
-
-exists(".Random.seed", envir = .GlobalEnv) # check whether there still is a seed present
-
-saveRDS(X, "/Users/dweemeri/surfdrive - Weemering, D.N. (Daphne)@surfdrive.surf.nl/desktop data/FRS.CEF/NEW/CEF_0.0_DA.rds")
-
-# p <- sapply(1:s, function(i) X[[i]][1:42])
-# p <- apply(p, 1, function(x) mean(x <= 0.05))
-
-
 

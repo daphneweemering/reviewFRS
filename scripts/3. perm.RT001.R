@@ -16,7 +16,7 @@ library(pbmcapply)
 
 
 TE <- 0
-TRT.cenrate <- 0.2 # 0 == original data; > 0 doubled attrition rate in active arm
+TRT.cenrate <- 1
 s <- 10000
 
 X <- pbmclapply(1:s, function(i){
@@ -29,18 +29,14 @@ X <- pbmclapply(1:s, function(i){
   
   D2 <- list(LD = D$LD, LD2 = D$LD2, LOCF2 = D$LOCF2)
 
-  
   # - ############################### MODELS ############################### - #
   # 1. -- Abe - 2014 - edaravone - PMID: 25286015 ------------------------------
   m1 <- lm(V3.CFB ~ TRT + DELFRS + ONSET + RILUSE, data = D1$LOCF)
   p1 <- drop1(m1, ~ TRT, test = "Chisq")[2, 5]
-  # PRESLOPE categorical (-4/-3 OR -2/-1). Used DELFRS instead.
   
   # 2. -- Abe - 2017 - edaravone - PMID: 28522181 (larger 2017 trial) ----------
   m2 <- lm(V3.CFB ~ TRT + DELFRS + I(AGE >= 65), data = D1$LOCF)
   p2 <- drop1(m2, ~ TRT, test = "Chisq")[2, 5]
-  # PRESLOPE categorical (-4/-3 OR -2/-1). Used DELFRS instead. El Escorial
-  # not available in dataset.
   
   # 3. -- Abe - 2017 - edaravone - PMID: 28872915 (smaller 2017 trial) ---------
   m3 <- lm(V3.CFB ~ TRT + DELFRS, data = D1$LOCF)
@@ -59,8 +55,7 @@ X <- pbmclapply(1:s, function(i){
   p6 <- unname(unlist(summary(emmeans(m6, specs = pairwise ~ TRT, at = list(VISIT = c("3")))$contrast)[6]))
   
   # 7. -- Berry - 2019 - MSC-NTF - PMID: 31740545 ------------------------------
-  # m7 <- lm(SLP ~ TRT + PER + PER:TRT, data = D2$LD.BER)
-  # p7 <- drop1(m7, ~ TRT:PER, test = "Chisq")[2, 5]
+  # not included (no pre-treatment slope)
   
   # 8. -- Boll - 2022 - valproate/lithium - PMID: 36049647 ---------------------
   m8 <- anova_test(data = D2$LD, dv = CFB, wid = ID, within = VISIT, between = TRT, type = 3)
@@ -81,8 +76,7 @@ X <- pbmclapply(1:s, function(i){
   p11 <- drop1(m11, ~ TIME:TRT, test = "Chisq")[2, 4]
   
   # 12. -- Cudkowicz - 2022 - MSC-NTF - PMID: 34890069 -------------------------
-  # m12 <- glm(RESP.CUD ~ TRT + BSLN + DISDUR + ONSET + RILUSE, family = binomial(link = "logit"), data = D1$LOCF.RESP)
-  # p12 <- drop1(m12, ~ TRT, test = "Chisq")[2, 5]
+  # not included (no pre-treatment slope)
   
   # 13. -- De Carvalho - 2010 - memantine - PMID: 20565333 ---------------------
   m13 <- anova_test(data = D2$LOCF2, dv = CFB, wid = ID, within = VISIT, between = TRT, type = 3)
@@ -95,7 +89,7 @@ X <- pbmclapply(1:s, function(i){
   p14 <- drop1(m14, test = "Chisq")[2, 5]
   
   # 15. -- Elia - 2015 - tauroursodeoxycholic acid - PMID: 25664595 ------------
-  # p15 <- unname(unlist(chisq.test(table(D1$LOCF.RESP$RESP.ELIA, D1$LOCF.RESP$TRT))[3]))
+  # not included (no pre-treatment slope)
   
   # 16. -- Genge - 2023 - ravulizumab - PMID: 37695623 -------------------------
   m16 <- lm(RANK.genge ~ TRT + AGE + SEX + V0.TOT + SVCP + DISDUR + ONSET + RILUSE, 
@@ -105,8 +99,6 @@ X <- pbmclapply(1:s, function(i){
   # 17. -- Gordon - 2007 - minocycline - PMID: 17980667 ------------------------
   m17 <- lmer(TOT ~ TIME + TRT + TIME:TRT + (TIME|ID), data = D2$LD)
   p17 <- drop1(m17, ~ TIME:TRT, test = "Chisq")[2, 4]
-  # They modeled the pre- and post treatment periods separately. This is not 
-  # possible in the RT001 dataset.
   
   # 18. -- Juntas-Morales - 2020 - MD1003 - PMID: 32140672 ---------------------
   m18 <- coin::wilcox_test(V3.CFB ~ as.factor(TRT), data = D1$ZERO, distribution = "exact")
@@ -140,16 +132,12 @@ X <- pbmclapply(1:s, function(i){
   # 25. -- Miller - 2007 - TCH346 - PMID: 17709710 -----------------------------
   m25 <- lmer(TOT ~ TIME + TRT + TIME:TRT + (TIME|ID), data = D2$LD)
   p25 <- drop1(m25, ~ TIME:TRT, test = "Chisq")[2, 4]
-  # They modeled the pre- and post treatment periods separately. This is not 
-  # possible in the RT001 dataset.
   
   # 26. -- Miller - 2015 - NP001 - PMID: 25884010 ------------------------------
   m26 <- lmer(TOT ~ TIME + TIME:TRT + AGE + SEX +  DISDUR + RILUSE + ONSET + 
                 BSLN + SVCL + (TIME|ID), data = D2$LD,
               control = lmerControl(optimizer = "nlminbwrap"))
   p26 <- drop1(m26, ~ TIME:TRT, test = "Chisq")[2, 4]
-  # RACE has only one option ("white"), familial onset and El Escorial not available
-  # in the data
   
   # 27. -- Miller - 2022 - tofersen - PMID: 36129998 ---------------------------
   m27 <- lapply(1:5, function(i){
@@ -174,7 +162,6 @@ X <- pbmclapply(1:s, function(i){
   # 31. -- Nagata - 2016 - bromocriptine mesylate - PMID: 26910108 -------------
   m31 <- lm(V3.CFB ~ TRT + AGE, data = D1$LOCF)
   p31 <- drop1(m31, ~ TRT, test = "Chisq")[2, 5]
-  # Japanese severity scale (or something similar) not available in data. 
   
   # 32. -- Nefussy - 2010 - G-CSF - PMID: 19449238 -----------------------------
   m32 <- lm(V3.CFB ~ TRT, data = D1$COMP)
@@ -188,8 +175,6 @@ X <- pbmclapply(1:s, function(i){
   m34 <- mmrm(CFB ~ TRT + VISIT + TRT:VISIT + CNTRY + ONSET + DISDUR + SVCP + 
                 us(VISIT|ID), data = D2$LD[!D2$LD$VISIT == 0, ])
   p34 <- unname(unlist(summary(emmeans(m34, specs = pairwise ~ TRT, at = list(VISIT = c("3")))$contrast)[6]))
-  # Japanese severity scale (or something similar) not available in data. Edaravone 
-  # use also not available in data (use riluzole?)
   
   # 35. -- Paganoni - 2020 - sodium phenylbutyrate-taurursodiol - PMID: 32877582
   m35 <- lmer(TOT ~ TIME + TIME:TRT + AGE:TIME + DELFRS:TIME + (TIME|ID), 
@@ -242,16 +227,6 @@ X <- pbmclapply(1:s, function(i){
                 DISDUR:TIME + RILUSE:TIME + (TIME|ID), data = D2$LD[!D2$LD$VISIT == 0, ])
   p45 <- drop1(m45, ~ TIME:TRT, test = "Chisq")[2, 4]
   
-  
   return(mget(paste0("p", c(1:6, 8:11, 13:14, 16:45))))
 }, mc.cores = 3) 
-
-saveRDS(X, file = "/Users/dweemeri/surfdrive - Weemering, D.N. (Daphne)@surfdrive.surf.nl/desktop data/FRS.RT001/RT001_0.0_DA.rds")
-
-# RT001_0.0_DA.rds
-
-# temp <- sapply(1:s, function(i) X[[i]][1:42])
-# p <- apply(temp, 1, function(x) mean(x <= 0.05))
-# p
-
 
