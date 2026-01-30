@@ -1,4 +1,4 @@
-# Statistical analysis of disability scales in randomised controlled clinical trials for amyotrophic lateral sclerosis: A systematic review
+# Statistical analysis of the ALSFRS-R in randomized controlled clinical trials for amyotrophic lateral sclerosis: A systematic review
 
 This research repository contains all material related to our study *"Statistical analysis of the ALSFRS-R in randomized controlled clinical trials for amyotrophic lateral sclerosis: A systematic review"*
 
@@ -11,19 +11,20 @@ the validity and the precision of trial results.
 | Folder/file | Content |
 |:-----------|:-----------------------------------------------------------------------|
 | figures    | Holds the figures that are available in the manuscript and supplementary material. |
-| scripts    | Contains analysis scripts:<br> • [`clean.CEF.R`](scripts/0.%20clean.CEF.R) – Cleans data from the Ceftriaxone ALS trial.<br> • [`clean.RT001.R`](scripts/0.%20clean.RT001.R) – Cleans data from the RT001 ALS trial.<br> • [`TE.R`](scripts/1.%20TE.R) – Simulates permuted treatment assignment and adds treatment effects.<br> • [`studyadj.R`](scripts/2.%20studyadj.R) – Adjusts data for study-based modifications.<br> • [`perm.CEF.R`](scripts/3.%20perm.CEF.R) – Fits models to the simulated Ceftriaxone ALS trial data.<br> • [`perm.RT001.R`](scripts/3.%20perm.RT001.R) – Fits models to the simulated RT001 ALS trial data.<br> • [`sim.JM.R`](scripts/4.%20sim.JM.R) – Simulates data using the joint modeling framework.<br> • [`models.JM.R`](scripts/5.%20models.JM.R) – Fits models to the simulated data created in [`sim.JM.R`](scripts/4.%20sim.JM.R).<br> • [`example.sim.R`](scripts/6.%20example.sim.R) – Creates a single simulated dataset and fits different models as an example of the analyses that we ran on the Ceftriaxone ALS trial data.<br> |
+| scripts    | Contains analysis scripts:<br> • [`clean.CEF.R`](scripts/0.%20clean.CEF.R) – Cleans data from the Ceftriaxone ALS trial.<br> • [`clean.RT001.R`](scripts/0.%20clean.RT001.R) – Cleans data from the RT001 ALS trial.<br> • [`TE.R`](scripts/1.%20TE.R) – Simulates permuted treatment assignment and adds treatment effects.<br> • [`studyadj.R`](scripts/2.%20studyadj.R) – Adjusts data for study-based modifications.<br> • [`perm.CEF.R`](scripts/3.%20perm.CEF.R) – Fits models to the simulated Ceftriaxone ALS trial data.<br> • [`perm.RT001.R`](scripts/3.%20perm.RT001.R) – Fits models to the simulated RT001 ALS trial data.<br> • [`sim.JM.R`](scripts/4.%20sim.JM.R) – Simulates data using the joint modeling framework.<br> • [`models.JM.R`](scripts/5.%20models.JM.R) – Fits models repeatedly to the simulated data created in [`sim.JM.R`](scripts/4.%20sim.JM.R) to obtain false-positives rate and power.<br> • [`example.sim.R`](scripts/6.%20example.sim.R) – Creates a single simulated dataset using [`sim.JM.R`](scripts/4.%20sim.JM.R) and fits different models as an example of the analyses that we ran on the Ceftriaxone ALS trial data.<br> |
 
 ## Example of the analyses that were done in this study #
 In our study, we used the Ceftriaxone ALS clinical trial dataset to guide the simulation of realistic trial scenarios with covariates. Because the original dataset cannot be shared, we provide simulated clinical trial data generated using a joint modeling framework. For a detailed description of the simulation method, see the eMethods section of the manuscript, or refer to the simulation code in [`sim.JM.R`](scripts/4.%20sim.JM.R). These simulated datasets allow users to reproduce the analyses from our study. The models can be run using these simulated data, but only include the baseline covariate (baseline score) as in our original analysis. Additional covariates are not included in the provided simulated data because simulating them while preserving the realistic dependencies observed in the original trial is not feasible.
-• For these analyses, R(studio) is needed.
 
-### Required files
+For these analyses, R(studio) is needed.
+
+#### Required files
 - [`sim.JM.R`](scripts/4.%20sim.JM.R): Contains the function `JMD()` to simulate clinical trial data.  
 - [`example.sim.R`](scripts/6.%20example.sim.R): Runs the example analyses on the simulated data.  
 
 Make sure both files are in the same folder.
 
-### Step 1: Set working directory
+#### Step 1: Set working directory
 
 ```r
 # Check current working directory
@@ -33,12 +34,12 @@ getwd()
 setwd("path/to/where/files/are")
 ``` 
 
-### Step 2: Source the simulation code
+#### Step 2: Source the simulation code
 ```r
 # Load the simulation code
 source("4. sim.JM.R")
 ```
-### Step 3: Simulate a trial dataset
+#### Step 3: Simulate a trial dataset
 ```r
 D <- JMD(
   N = 500,        # number of patients
@@ -54,12 +55,12 @@ D <- JMD(
 - D is a list containing 16 datasets, each in a different format or with a different missing data strategy (e.g., long, wide, LOCF, complete cases).
 - A short description of each dataset is included in the script.
 
-### Step 4: Fit the models
+#### Step 4: Fit the models
 - `est()` extracts treatment effect estimates.
 - Lines 58–213 fit multiple models (m1, m2, …, m30) and extract p-values (p1, p2, …, p30) and estimates (e1, e2, …, e30).
 - For each model, a short description is given of: the outcome, the analysis approach, the missing data strategy for death, the missing data strategy for non-death missingness, and adjustment for baseline score (respectively).
 
-### Step 5. Explore results
+#### Step 5. Explore results
 - The results (e1–e30 and p1–p30) show treatment effects and p-values for each model.
 - Use these outputs to understand how different modeling choices and missing data strategies affect the results in simulated trial scenarios.
 
