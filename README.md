@@ -3,7 +3,7 @@
 This research repository contains all material related to our study *"Statistical analysis of the ALSFRS-R in randomized controlled clinical trials for amyotrophic lateral sclerosis: A systematic review"*
 
 ## What's the project about? # 
-Disability rating scales, like the ALSFRS-R, play a pivotal role in clinical trials by assessing how experimental treatments affect the daily lives of people with neurodegenerative diseases. Limited guidance on analyzing these scales may contribute to the high failure rate of clinical trials. Using amyotrophic lateral sclerosis (ALS) as a case study, we aim to systematically review how disability rating scales have been analyzed in clinical trials, and how these approaches influence
+Disability rating scales, like the amyotrophic lateral sclerosis function rating scale revised (ALSFRS-R), play a pivotal role in clinical trials by assessing how experimental treatments affect the daily lives of people with neurodegenerative diseases. Limited guidance on analyzing these scales may contribute to the high failure rate of clinical trials. Using amyotrophic lateral sclerosis (ALS) as a case study, we aim to systematically review how disability rating scales have been analyzed in clinical trials, and how these approaches influence
 the validity and the precision of trial results.
 
 ## What is in the repository? #
@@ -52,7 +52,7 @@ D <- JMD(
   DO.PLB = 0.1    # dropout for placebo
 )
 ```
-- D is a list containing 16 datasets, each in a different format or with a different missing data strategy (e.g., long, wide, LOCF, complete cases).
+- D is a list containing 15 datasets, each in a different format or with a different missing data strategy (e.g., long, wide, LOCF, complete cases).
 - A short description of each dataset is included in the script.
 
 #### Step 4: Fit the models
@@ -199,4 +199,4 @@ D <- JMD(
 The creation and maintenance of this research repository are the responsibilities of the author (Daphne Weemering). This archive is completely open access, and can be accessed for an indefinite period.
 
 ## Contact 
-You can reach me via email at <d.n.weemering@umcutrecht.nl> or <dnweemering@gmail.com> for questions regarding this repository. For correspondence regarding this article, contact Dr. Ruben van Eijk (corresponding author) at <r.p.a.vaneijk-2@umcutrecht.nl>.
+You can reach me via email at <d.n.weemering@umcutrecht.nl> or <dnweemering@gmail.com> for questions regarding this repository. For correspondence regarding the article, contact Dr. Ruben van Eijk (corresponding author) at <r.p.a.vaneijk-2@umcutrecht.nl>.
