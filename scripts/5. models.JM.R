@@ -3,7 +3,7 @@
 ##                                SCENARIOS                                   ##
 ##                                                                            ##
 ################################################################################
-source("sim.JM.NEW.R")
+source("4. sim.JM.R")
 
 library(MASS)
 library(lme4)
@@ -34,13 +34,11 @@ est <- function(x){
 
 set.seed(3239480)
 
-X <- pbmclapply(1:300, function(i){
-  # 1. Get the data
-  # D <- JMD(N = 500, Nm = 7, Nm.pre = 4, B2 = 0, B4 = 0, g1 = 0, FUT = 12, DO.TRT = 0.1, DO.PLB = 0.1) 
-  D <- JMD(N = 500, Nm = 7, Nm.pre = 4, FUT = 12, B2 = 0, g1 = log(1), cenrate = 0.2)
-
+X <- pbmclapply(1:10000, function(i){
+  # Get the simulated data _____________________________________________________
+  D <- JMD(N = 500, Nm = 7, Nm.pre = 4, B2 = 0, B4 = 0, g1 = 0, FUT = 12, DO.TRT = 0.1, DO.PLB = 0.1)
   
-  # Models _____________________________________________________________________
+  # Fit the models _____________________________________________________________
   m1 <- lm(CFB_6 ~ TRT, data = D$LOCF)
   e1 <- est(m1)
   p1 <- drop1(m1, test = "Chisq")[2, 5]

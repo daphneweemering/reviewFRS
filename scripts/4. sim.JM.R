@@ -19,7 +19,7 @@ library(mice)
 library(pbmcapply)
 library(tidyverse)
 
-
+local({
 # 1. functions required for simulating survival times --------------------------
 # longitudinal process, current value and slope
 mi1 <- function (t, B0 = 39.24208, B1 = -14.329175, B3 = 1.30610, u0i = u0i, u1i = u1i, u2i = u2i){                    
@@ -491,6 +491,11 @@ JMD <- function(N = 500, Nm = 7, Nm.pre, B2 = 0, B4 = 0, g1 = 0, FUT = 12, DO.TR
   return(list(LD = LD, WD = WD, LOCF = LOCF, ZERO = ZERO, CC = CC, LOCF2 = LOCF2,
               WD.AGG = WD.AGG, WD.JR = WD.JR, WD.MILL = WD.MILL, LOCF.MORA = LOCF.MORA, 
               WD.KAJI = WD.KAJI, WD.KAUF = WD.KAUF, LOCF.BERRY = LOCF.BERRY, 
-              RESP.ELIA = RESP.ELIA, RESP.CUD = RESP.CUD, DL2 = DL2))
+              RESP.ELIA = RESP.ELIA, RESP.CUD = RESP.CUD))
   
 }
+
+assign("JMD", JMD, envir = .GlobalEnv)
+})
+
+
