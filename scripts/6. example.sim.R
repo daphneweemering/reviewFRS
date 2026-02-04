@@ -276,6 +276,7 @@ Z <- sapply(1:30, function(i) est(get(paste0("m", i)))$`z-score`)
 # put everything together
 results <- data.frame(model = 1:30, zscore = Z)
 
+# create figure
 par(mar = c(5, 7, 4, 2))
 results <- results[order(results$zscore), ]
 plot(NULL, xlab = "Z-score", ylab = "", axes = F, xlim = c(-3, 3), ylim = c(1, 30), frame.plot = T)
