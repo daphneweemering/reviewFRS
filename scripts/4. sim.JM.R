@@ -162,7 +162,9 @@ JMD <- function(N = 500, Nm = 7, Nm.pre, B2 = 0, B4 = 0, g1 = 0, FUT = 12, DO.TR
   setDT(DL); setDT(D)
   D1 <- dcast(DL, ID ~ VISIT, value.var = c("TIME", "TOT", "CFB"))
   D <- D[D1, on = "ID"]
-  D <- D[, !c(paste0("TIME_-", 1:3), paste0("TOT_-", 1:3), paste0("CFB_-", 1:3))]
+
+  cols_to_remove <- grep("^(TIME_-|TOT_-|CFB_-)", names(D), value = TRUE)
+  D <- D[, !..cols_to_remove]
   
   # datasets with LOCF, CC, ZERO
   LOCF <- D[, which(names(D) == "TOT_0"):which(names(D) == "CFB_6")]
