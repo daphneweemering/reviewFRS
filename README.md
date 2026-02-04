@@ -56,13 +56,16 @@ D <- JMD(
 - A short description of each dataset is included in the script.
 
 #### Step 4: Fit the models
-- `est()` extracts treatment effect estimates.
-- Lines 58–213 fit multiple models (m1, m2, …, m30) and extract p-values (p1, p2, …, p30) and estimates (e1, e2, …, e30).
+- `est()` extracts effect estimates, p-values and z-scores.
+- Lines 137–269 fit multiple models (m1, m2, …, m30).
 - For each model, a short description is given of: the outcome, the analysis approach, the missing data strategy for death, the missing data strategy for non-death missingness, and adjustment for baseline score (respectively).
 
 #### Step 5. Explore results
-- The results (e1–e30 and p1–p30) show treatment effects and p-values for each model.
+- Results can be explored using the `est()` function for the different models. For example: `est(m1)` gives the effect estimate, p-value and z-score for m1. 
 - Use these outputs to understand how different modeling choices and missing data strategies affect the results in simulated trial scenarios.
+
+#### Step 6. Visual display
+- The last lines of code create a figure similar to Figure 4 in the article, showing z-scores for each model. All models should be available in the global environment to create the figure. 
 
 ## Machine and package information
 ```
