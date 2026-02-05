@@ -3,7 +3,7 @@
 This research repository contains all material related to our study *"Statistical analysis of the ALSFRS-R in randomized controlled clinical trials for amyotrophic lateral sclerosis: A systematic review"*
 
 ## What's the project about? # 
-Disability rating scales, like the amyotrophic lateral sclerosis function rating scale revised (ALSFRS-R), play a pivotal role in clinical trials by assessing how experimental treatments affect the daily lives of people with neurodegenerative diseases. Limited guidance on analyzing these scales may contribute to the high failure rate of clinical trials. Using amyotrophic lateral sclerosis (ALS) as a case study, we aim to systematically review how disability rating scales have been analyzed in clinical trials, and how these approaches influence
+Disability rating scales, like the revised amyotrophic lateral sclerosis function rating scale (ALSFRS-R), play a pivotal role in clinical trials by assessing how experimental treatments affect the daily lives of people with neurodegenerative diseases. Limited guidance on analyzing these scales may contribute to the high failure rate of clinical trials. Using amyotrophic lateral sclerosis (ALS) as a case study, we aim to systematically review how disability rating scales have been analyzed in clinical trials, and how these approaches influence
 the validity and the precision of trial results.
 
 ## What is in the repository? #
